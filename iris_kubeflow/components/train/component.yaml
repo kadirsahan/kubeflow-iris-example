@@ -10,7 +10,7 @@ outputs:
 
 implementation:
   container:
-    image: gcr.io/your-project-id/iris-train:latest # CHANGE_ME: Replace with your container registry path
+    image: 192.168.58.12:30002/kubeflow-iris/iris-train:v1.0
     command: [
       python, train.py,
       --data_path, {inputPath: data},

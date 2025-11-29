@@ -7,7 +7,7 @@ inputs:
 
 implementation:
   container:
-    image: gcr.io/your-project-id/iris-predict:latest # CHANGE_ME: Replace with your container registry path
+    image: 192.168.58.12:30002/kubeflow-iris/iris-predict:v1.0
     command: [
       python, predict.py,
       --model_path, {inputPath: model},

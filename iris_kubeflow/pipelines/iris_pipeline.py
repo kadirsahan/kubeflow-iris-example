@@ -11,9 +11,10 @@ def iris_pipeline(
     prediction_data: str = "5.1,3.5,1.4,0.2;6.7,3.0,5.2,2.3",
 
     # --- Parameters for CI/CD: These will be provided by the CI pipeline ---
-    download_image: str = 'gcr.io/your-project-id/iris-download:latest', # CHANGE_ME to a default or placeholder
-    train_image: str = 'gcr.io/your-project-id/iris-train:latest',       # CHANGE_ME to a default or placeholder
-    predict_image: str = 'gcr.io/your-project-id/iris-predict:latest'     # CHANGE_ME to a default or placeholder
+    # Updated to use Harbor registry images
+    download_image: str = '192.168.58.12:30002/kubeflow-iris/iris-download:v1.0',
+    train_image: str = '192.168.58.12:30002/kubeflow-iris/iris-train:v1.0',
+    predict_image: str = '192.168.58.12:30002/kubeflow-iris/iris-predict:v1.0'
 ):
     """
     Defines the Iris classification pipeline using container components.
@@ -48,5 +49,17 @@ def iris_pipeline(
         ]
     )(model=train_task.outputs['model'])
 
-# Local compilation is removed as this pipeline is intended to be triggered by the CI pipeline,
-# not compiled directly from a static file.
+if __name__ == '__main__':
+    from kfp import compiler
+
+    # Compile the pipeline for local use
+    compiler.Compiler().compile(
+        pipeline_func=iris_pipeline,
+        package_path='iris_pipeline_compiled.yaml'
+    )
+    print("Pipeline compiled successfully to: iris_pipeline_compiled.yaml")
+    print("")
+    print("Using Harbor images:")
+    print("  - download: 192.168.58.12:30002/kubeflow-iris/iris-download:v1.0")
+    print("  - train: 192.168.58.12:30002/kubeflow-iris/iris-train:v1.0")
+    print("  - predict: 192.168.58.12:30002/kubeflow-iris/iris-predict:v1.0")

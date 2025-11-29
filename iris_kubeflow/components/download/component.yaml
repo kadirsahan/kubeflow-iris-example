@@ -6,7 +6,7 @@ outputs:
 
 implementation:
   container:
-    image: gcr.io/your-project-id/iris-download:latest # CHANGE_ME: Replace with your container registry path
+    image: 192.168.58.12:30002/kubeflow-iris/iris-download:v1.0
     command: [
       python, download.py,
       --output_path, {outputPath: data},

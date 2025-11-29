@@ -1,0 +1,19 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: minio-user-namespace-access
+  namespace: kubeflow
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: seaweedfs
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/user-example-com/sa/iris-sa"
+  - from:
+    - source:
+        namespaces:
+        - "user-example-com"

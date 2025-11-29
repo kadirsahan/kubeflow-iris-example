@@ -1,0 +1,137 @@
+# Harbor Helm Chart Values
+# This configuration sets up Harbor container registry for Kubeflow
+
+# Expose the service
+expose:
+  type: nodePort
+  tls:
+    enabled: false
+    # If you want to enable TLS, set to true and provide certificates
+    # certSource: auto
+    # auto:
+    #   commonName: "harbor.example.com"
+  nodePort:
+    name: harbor
+    ports:
+      http:
+        port: 80
+        nodePort: 30002
+      https:
+        port: 443
+        nodePort: 30003
+  # For LoadBalancer (cloud environments):
+  # type: loadBalancer
+  # For Ingress (with ingress controller):
+  # type: ingress
+  # ingress:
+  #   hosts:
+  #     core: harbor.example.com
+
+# External URL for Harbor
+externalURL: http://localhost:30002
+
+# Harbor admin password (change this!)
+harborAdminPassword: "Harbor12345"
+
+# Persistence settings
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    registry:
+      storageClass: ""
+      size: 20Gi
+    chartmuseum:
+      storageClass: ""
+      size: 5Gi
+    jobservice:
+      storageClass: ""
+      size: 1Gi
+    database:
+      storageClass: ""
+      size: 1Gi
+    redis:
+      storageClass: ""
+      size: 1Gi
+    trivy:
+      storageClass: ""
+      size: 5Gi
+
+# Database configuration
+database:
+  type: internal
+  internal:
+    password: "changeit"
+    # For production, consider using external database:
+  # type: external
+  # external:
+  #   host: "postgres.example.com"
+  #   port: "5432"
+  #   username: "harbor"
+  #   password: "password"
+  #   coreDatabase: "registry"
+
+# Redis configuration
+redis:
+  type: internal
+  internal:
+    password: "changeit"
+
+# Trivy scanner for vulnerability scanning
+trivy:
+  enabled: true
+  gitHubToken: ""
+  skipUpdate: false
+
+# ChartMuseum for Helm charts (optional)
+chartmuseum:
+  enabled: true
+
+# Notary for image signing (optional)
+notary:
+  enabled: false
+
+# Core configuration
+core:
+  replicas: 1
+  # Resource limits
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 100m
+  #   limits:
+  #     memory: 512Mi
+  #     cpu: 500m
+
+# JobService configuration
+jobservice:
+  replicas: 1
+  maxJobWorkers: 10
+
+# Registry configuration
+registry:
+  replicas: 1
+  # Credentials for pulling images
+  credentials:
+    username: "harbor_registry_user"
+    password: "harbor_registry_password"
+
+# Portal (UI) configuration
+portal:
+  replicas: 1
+
+# Nginx configuration
+nginx:
+  replicas: 1
+
+# Metrics
+metrics:
+  enabled: false
+  # For Prometheus integration:
+  # serviceMonitor:
+  #   enabled: true
+
+# Cache configuration
+cache:
+  enabled: false
+  expireHours: 24

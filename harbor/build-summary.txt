@@ -1,0 +1,162 @@
+==========================================
+Harbor Image Build Summary
+==========================================
+Date: 2025-11-29
+Harbor Registry: 192.168.58.12:30002
+Project: kubeflow-iris
+Image Tag: v1.0
+
+==========================================
+Images Successfully Built and Pushed
+==========================================
+
+1. iris-download
+   - Full Name: 192.168.58.12:30002/kubeflow-iris/iris-download:v1.0
+   - Image ID: ff422dc73e1d
+   - Size: 1.21GB
+   - Purpose: Downloads Iris dataset
+   - Status: ✓ Pushed to Harbor
+
+2. iris-train
+   - Full Name: 192.168.58.12:30002/kubeflow-iris/iris-train:v1.0
+   - Image ID: 3d8c0e0cb5bc
+   - Size: 1.21GB
+   - Purpose: Trains ML model on Iris dataset
+   - Status: ✓ Pushed to Harbor
+
+3. iris-predict
+   - Full Name: 192.168.58.12:30002/kubeflow-iris/iris-predict:v1.0
+   - Image ID: 43aa79f5fb78
+   - Size: 1.21GB
+   - Purpose: Makes predictions using trained model
+   - Status: ✓ Pushed to Harbor
+
+==========================================
+Harbor Repository Information
+==========================================
+
+All repositories verified in Harbor:
+
+1. kubeflow-iris/iris-download
+   - Artifact Count: 1
+   - Creation Time: 2025-11-29T12:38:32.024Z
+   - Pull Count: 0
+
+2. kubeflow-iris/iris-train
+   - Artifact Count: 1
+   - Creation Time: 2025-11-29T12:38:34.672Z
+   - Pull Count: 0
+
+3. kubeflow-iris/iris-predict
+   - Artifact Count: 1
+   - Creation Time: 2025-11-29T12:38:36.844Z
+   - Pull Count: 0
+
+==========================================
+Kubernetes Integration
+==========================================
+
+Harbor Secret Created:
+  Name: harbor-credentials
+  Namespace: kubeflow
+  Type: Opaque (Docker config.json)
+  Status: ✓ Active
+
+This secret contains authentication credentials for pulling images
+from Harbor registry in Kubeflow pipelines.
+
+==========================================
+Next Steps
+==========================================
+
+1. Update Kubeflow Pipeline Component YAMLs
+   Update the component.yaml files to use Harbor images:
+
+   /home/kfmrgnmn/projects/kubeflow/iris_kubeflow/components/download/component.yaml
+   /home/kfmrgnmn/projects/kubeflow/iris_kubeflow/components/train/component.yaml
+   /home/kfmrgnmn/projects/kubeflow/iris_kubeflow/components/predict/component.yaml
+
+   Change the image field to:
+   image: 192.168.58.12:30002/kubeflow-iris/iris-<component>:v1.0
+
+2. Update Pipeline to Use Harbor Images
+   Edit: /home/kfmrgnmn/projects/kubeflow/iris_kubeflow/pipelines/iris_pipeline.py
+
+   Reference the updated component.yaml files
+
+3. Test Image Pull from Kubernetes
+   kubectl run test-pull --image=192.168.58.12:30002/kubeflow-iris/iris-download:v1.0 \
+     --image-pull-secrets=harbor-credentials \
+     -n kubeflow \
+     --command -- sleep 3600
+
+4. Run CI Pipeline (Optional)
+   The CI pipeline can be used for automated builds in the future:
+   - Update git_repo_url in ci_pipeline.py
+   - Update harbor_repo_prefix to "192.168.58.12:30002/kubeflow-iris"
+   - Compile and run the CI pipeline
+
+5. Run Iris ML Pipeline
+   After updating component images, compile and run the main pipeline
+
+==========================================
+Access Information
+==========================================
+
+Harbor UI:
+  URL: http://192.168.58.12:30002
+  Username: admin
+  Password: Harbor12345
+
+View Images in Harbor:
+  1. Login to Harbor UI
+  2. Navigate to Projects → kubeflow-iris
+  3. View repositories and artifacts
+
+Pull Images (with Docker):
+  docker login 192.168.58.12:30002
+  docker pull 192.168.58.12:30002/kubeflow-iris/iris-download:v1.0
+  docker pull 192.168.58.12:30002/kubeflow-iris/iris-train:v1.0
+  docker pull 192.168.58.12:30002/kubeflow-iris/iris-predict:v1.0
+
+==========================================
+Files Created in harbor/ Directory
+==========================================
+
+1. values.yaml                       - Harbor Helm chart configuration
+2. install-harbor.sh                 - Harbor installation script
+3. README.md                         - Comprehensive documentation
+4. harbor-installation-output.txt   - Harbor installation logs
+5. create-harbor-secret.sh          - Script to create K8s secret
+6. create-harbor-project.sh         - Script to create Harbor project
+7. build-and-push-images.sh         - Docker build and push script
+8. configure-docker-harbor.sh       - Docker daemon configuration
+9. build-summary.txt                - This file
+
+==========================================
+Troubleshooting
+==========================================
+
+If images cannot be pulled in Kubernetes:
+
+1. Verify containerd configuration on worker nodes
+2. Check Harbor credentials secret exists
+3. Verify network connectivity to Harbor
+4. Check pod events: kubectl describe pod <pod-name> -n kubeflow
+
+If you need to rebuild images:
+  1. Update the source code in components/
+  2. Change IMAGE_TAG in build-and-push-images.sh
+  3. Run: ./build-and-push-images.sh
+
+==========================================
+Success! 🎉
+==========================================
+
+All three Kubeflow component images have been successfully:
+✓ Built from source
+✓ Tagged with v1.0
+✓ Pushed to Harbor registry
+✓ Verified in Harbor
+
+Your Harbor registry is ready for use with Kubeflow pipelines!

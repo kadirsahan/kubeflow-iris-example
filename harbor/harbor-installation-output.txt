@@ -1,0 +1,182 @@
+==========================================
+Harbor Installation Output
+==========================================
+Date: 2025-11-29
+Kubernetes Cluster: huawei-master
+
+==========================================
+Installation Summary
+==========================================
+
+Harbor Status: ✅ Successfully Installed
+Namespace: harbor
+Release Name: harbor
+Helm Chart: harbor/harbor
+
+==========================================
+Harbor Pods Status
+==========================================
+
+NAME                                 READY   STATUS    RESTARTS      AGE
+harbor-core-6645c57889-hdj62         1/1     Running   0             118s
+harbor-database-0                    1/1     Running   0             118s
+harbor-jobservice-5b996b846d-fqhrr   1/1     Running   3 (62s ago)   118s
+harbor-nginx-578c57976d-f7lcp        1/1     Running   0             118s
+harbor-portal-8547f77cc6-mbchx       1/1     Running   0             118s
+harbor-redis-0                       1/1     Running   0             118s
+harbor-registry-5bb8595b5d-4kcwr     2/2     Running   0             118s
+harbor-trivy-0                       1/1     Running   0             118s
+
+All 8 pods are running and ready ✅
+
+==========================================
+Harbor Services
+==========================================
+
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+harbor              NodePort    10.103.200.198   <none>        80:30002/TCP        2m3s
+harbor-core         ClusterIP   10.97.165.83     <none>        80/TCP              2m3s
+harbor-database     ClusterIP   10.109.130.9     <none>        5432/TCP            2m3s
+harbor-jobservice   ClusterIP   10.110.99.16     <none>        80/TCP              2m3s
+harbor-portal       ClusterIP   10.99.167.255    <none>        80/TCP              2m3s
+harbor-redis        ClusterIP   10.109.41.166    <none>        6379/TCP            2m3s
+harbor-registry     ClusterIP   10.111.147.127   <none>        5000/TCP,8080/TCP   2m3s
+harbor-trivy        ClusterIP   10.103.40.186    <none>        8080/TCP            2m3s
+
+==========================================
+Kubernetes Nodes
+==========================================
+
+NAME               STATUS   ROLES           VERSION   INTERNAL-IP
+huawei-master      Ready    control-plane   v1.34.2   192.168.58.12
+huawei-worker-01   Ready    <none>          v1.34.2   192.168.58.13
+huawei-worker-02   Ready    <none>          v1.34.2   192.168.58.14
+huawei-worker-03   Ready    <none>          v1.34.2   192.168.58.15
+
+==========================================
+Access Information
+==========================================
+
+Harbor UI URLs (NodePort: 30002):
+- http://192.168.58.12:30002 (master node)
+- http://192.168.58.13:30002 (worker-01)
+- http://192.168.58.14:30002 (worker-02)
+- http://192.168.58.15:30002 (worker-03)
+
+Default Login Credentials:
+- Username: admin
+- Password: Harbor12345
+
+⚠️  IMPORTANT: Change the admin password immediately after first login!
+
+==========================================
+Harbor Components Installed
+==========================================
+
+1. harbor-core         - Main Harbor service
+2. harbor-database     - PostgreSQL database
+3. harbor-jobservice   - Background job processing
+4. harbor-nginx        - Reverse proxy
+5. harbor-portal       - Web UI
+6. harbor-redis        - Cache and session storage
+7. harbor-registry     - Docker registry
+8. harbor-trivy        - Vulnerability scanner
+
+==========================================
+Configuration Files
+==========================================
+
+Location: /home/kfmrgnmn/projects/kubeflow/harbor/
+
+Files:
+- values.yaml                     - Harbor Helm chart configuration
+- install-harbor.sh              - Installation script
+- README.md                      - Complete documentation
+- harbor-installation-output.txt - This file
+
+==========================================
+Next Steps
+==========================================
+
+1. Access Harbor UI
+   - Open browser: http://192.168.58.12:30002
+   - Login with admin/Harbor12345
+   - Change admin password immediately
+
+2. Create a Project
+   - Click "New Project"
+   - Name: kubeflow-components
+   - Access Level: Private or Public
+
+3. Configure Docker/containerd for Insecure Registry
+
+   For Docker:
+   Edit /etc/docker/daemon.json:
+   {
+     "insecure-registries": ["192.168.58.12:30002"]
+   }
+
+   Then restart: sudo systemctl restart docker
+
+   For containerd (Kubernetes):
+   Add to /etc/containerd/config.toml and restart containerd
+
+4. Login to Harbor Registry
+   docker login 192.168.58.12:30002
+   Username: admin
+   Password: Harbor12345
+
+5. Create Kubernetes Secret for Harbor
+   kubectl create secret docker-registry harbor-secret \
+     --docker-server=192.168.58.12:30002 \
+     --docker-username=admin \
+     --docker-password=Harbor12345 \
+     --docker-email=admin@example.com \
+     -n kubeflow
+
+6. Push Images to Harbor
+   docker tag my-image:latest 192.168.58.12:30002/kubeflow-components/my-image:latest
+   docker push 192.168.58.12:30002/kubeflow-components/my-image:latest
+
+==========================================
+Useful Commands
+==========================================
+
+Check Harbor pods:
+  kubectl get pods -n harbor
+
+Check Harbor services:
+  kubectl get svc -n harbor
+
+View Harbor logs:
+  kubectl logs -n harbor <pod-name>
+
+Restart Harbor pod:
+  kubectl delete pod -n harbor <pod-name>
+
+Upgrade Harbor:
+  helm upgrade harbor harbor/harbor -n harbor -f values.yaml
+
+Uninstall Harbor:
+  helm uninstall harbor -n harbor
+
+==========================================
+Troubleshooting
+==========================================
+
+If you cannot access Harbor UI:
+1. Check pods are running: kubectl get pods -n harbor
+2. Check service: kubectl get svc -n harbor
+3. Check firewall rules on nodes
+4. Verify NodePort 30002 is accessible
+
+If Docker cannot push to Harbor:
+1. Ensure Harbor is in insecure-registries config
+2. Restart Docker daemon
+3. Login to Harbor: docker login 192.168.58.12:30002
+
+For more help, see README.md in the harbor folder.
+
+==========================================
+Installation Complete! 🎉
+==========================================

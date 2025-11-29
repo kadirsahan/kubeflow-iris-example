@@ -1,0 +1,16 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: iris-fastapi-runtime
+  namespace: user-example-com
+spec:
+  supportedModelFormats:
+    - name: sklearn
+      version: "1"
+      autoSelect: true
+  containers:
+    - name: kserve-container
+      image: 192.168.58.12:30002/kubeflow-iris/iris-serve:v1.1
+      ports:
+        - containerPort: 8080
+          protocol: TCP

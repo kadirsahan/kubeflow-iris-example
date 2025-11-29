@@ -1,0 +1,26 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: iris-model
+  namespace: user-example-com
+  annotations:
+    serving.kserve.io/s3-endpoint: "minio-service.kubeflow:9000"
+    serving.kserve.io/s3-usehttps: "0"
+    serving.kserve.io/s3-region: "us-east-1"
+    serving.kserve.io/s3-verifyssl: "0"
+    serving.kserve.io/s3-useanoncredential: "false"
+    serving.kserve.io/storageSecretName: "minio-s3-secret"
+spec:
+  predictor:
+    serviceAccountName: iris-sa
+    model:
+      modelFormat:
+        name: sklearn
+      storageUri: "s3://mlpipeline/private-artifacts/user-example-com/v2/artifacts/iris-classification-pipeline/d014508d-22ca-4bc5-9233-f3d86ac25e11/train-iris-model/63649148-786d-4fe6-86f5-c8d20a1732b8/"
+      resources:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
