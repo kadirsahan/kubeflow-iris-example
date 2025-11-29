@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: iris-pipeline-run-
+  # The namespace where the pipeline will be executed.
+  # This must match the namespace created in 'manifests/k8s/namespace.yaml'.
+  namespace: iris-pipeline-example
+spec:
+  # This is the main entrypoint for the pipeline, matching the function name in the Python script.
+  entrypoint: iris-classification-pipeline
+  
+  # The service account under which the pipeline pods will run.
+  serviceAccountName: default
+  
+  # --- Pipeline Arguments ---
+  # The values here override the default parameters defined in the pipeline script.
+  arguments:
+    parameters:
+      # Model selection: 'xgboost', 'random_forest', or 'logistic_regression'
+      - name: model_name
+        value: "random_forest"
+        
+      # JSON string of hyperparameters for the selected model.
+      - name: model_hyperparameters
+        value: '{ "n_estimators": 200, "max_depth": 10, "random_state": 42 }'
+        
+      # Sample data for the final prediction step.
+      - name: prediction_data
+        value: "5.9,3.0,4.2,1.5;7.0,3.2,4.7,1.4"
+
+  # This references the compiled pipeline that has been uploaded to Kubeflow.
+  # The 'name' should match the pipeline's name in the KFP UI.
+  workflowTemplateRef:
+    name: iris-classification-pipeline
