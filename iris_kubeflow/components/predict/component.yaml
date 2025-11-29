@@ -1,0 +1,15 @@
+name: Predict Iris Species
+description: Makes predictions on sample data using a trained XGBoost model.
+
+inputs:
+  - {name: model, type: Model, description: 'Path to the trained XGBoost model.'}
+  - {name: input_data, type: String, description: 'Semicolon-separated list of comma-separated feature vectors.'}
+
+implementation:
+  container:
+    image: gcr.io/your-project-id/iris-predict:latest # CHANGE_ME: Replace with your container registry path
+    command: [
+      python, predict.py,
+      --model_path, {inputPath: model},
+      --input_data, {inputValue: input_data},
+    ]

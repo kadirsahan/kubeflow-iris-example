@@ -1,0 +1,13 @@
+name: Download Iris Dataset
+description: Downloads the Iris dataset and saves it as a CSV file.
+
+outputs:
+  - {name: data, type: Dataset, description: 'Path to the downloaded CSV data.'}
+
+implementation:
+  container:
+    image: gcr.io/your-project-id/iris-download:latest # CHANGE_ME: Replace with your container registry path
+    command: [
+      python, download.py,
+      --output_path, {outputPath: data},
+    ]

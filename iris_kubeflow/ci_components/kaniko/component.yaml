@@ -1,0 +1,44 @@
+name: Kaniko Build
+description: Builds a container image from a Dockerfile and pushes it to a registry using Kaniko.
+
+inputs:
+  - {name: build_context, type: Artifact, description: 'The build context directory containing the Dockerfile.'}
+  - {name: destination_image, type: String, description: 'The full destination image path including tag (e.g., myharbor.com/my-project/image:tag).'}
+  - {name: docker_config_secret_name, type: String, description: 'The name of the Kubernetes secret containing the docker config.json for authentication.'}
+
+implementation:
+  container:
+    image: gcr.io/kaniko-project/executor:v1.9.0
+    command:
+      - /kaniko/executor
+    args:
+      - --dockerfile=Dockerfile
+      - --context
+      - {inputPath: build_context}
+      - --destination
+      - {inputValue: destination_image}
+      - --docker-config-json-path=/kaniko/.docker/config.json
+  # This part is crucial for mounting the Harbor credentials from a Kubernetes Secret
+  # It assumes a secret exists with a key 'config.json'
+  pod_spec_patch: >
+    {
+      "containers": [
+        {
+          "name": "main",
+          "volumeMounts": [
+            {
+              "name": "docker-config-volume",
+              "mountPath": "/kaniko/.docker"
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "name": "docker-config-volume",
+          "secret": {
+            "secretName": "{{$.inputs.parameters['docker_config_secret_name']}}"
+          }
+        }
+      ]
+    }

@@ -1,0 +1,20 @@
+name: Train Iris Model
+description: Trains a classifier on the Iris dataset.
+
+inputs:
+  - {name: data, type: Dataset, description: 'Path to the training data CSV.'}
+  - {name: model_name, type: String, default: 'xgboost', description: 'The name of the model to train (e.g., xgboost, random_forest).'}
+  - {name: model_hyperparameters, type: String, default: '{}', description: 'JSON string of hyperparameters for the model.'}
+outputs:
+  - {name: model, type: Model, description: 'Path to the trained model file.'}
+
+implementation:
+  container:
+    image: gcr.io/your-project-id/iris-train:latest # CHANGE_ME: Replace with your container registry path
+    command: [
+      python, train.py,
+      --data_path, {inputPath: data},
+      --model_output_path, {outputPath: model},
+      --model-name, {inputValue: model_name},
+      --model-hyperparameters, {inputValue: model_hyperparameters}
+    ]

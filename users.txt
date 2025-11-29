@@ -1,0 +1,4 @@
+Use the following default credentials:
+   * Email: user@example.com
+   * Password: 12341234
+
